@@ -13,12 +13,12 @@ namespace DewCore.Abstract.Graph
     }
     public interface IPath<V>
     {
-        INodeList<V> ShortPathDijkstra(INode<INodeList<V>, V> start, INode<INodeList<V>, V> end);
-        INodeList<V> ShortPathBFS(INode<INodeList<V>, V> start, INode<INodeList<V>, V> end);
-        INodeList<V> AStar(INode<INodeList<V>, V> start, INode<INodeList<V>, V> end);
-        INodeList<V> WAStar(INode<INodeList<V>, V> start, INode<INodeList<V>, V> end);
-        INodeList<V> BFS(INode<INodeList<V>, V> start, INode<INodeList<V>, V> end);
-        INodeList<V> Dijkstra(INode<INodeList<V>, V> start, INode<INodeList<V>, V> end);
+        INodeList<V> ShortPathDijkstra(INode<IEdgeList<V>, V> start, INode<IEdgeList<V>, V> end);
+        INodeList<V> ShortPathBFS(INode<IEdgeList<V>, V> start, INode<IEdgeList<V>, V> end);
+        INodeList<V> AStar(INode<IEdgeList<V>, V> start, INode<IEdgeList<V>, V> end);
+        INodeList<V> WAStar(INode<IEdgeList<V>, V> start, INode<IEdgeList<V>, V> end);
+        INodeList<V> BFS(INode<IEdgeList<V>, V> start, INode<IEdgeList<V>, V> end);
+        INodeList<V> Dijkstra(INode<IEdgeList<V>, V> start, INode<IEdgeList<V>, V> end);
         IPath<V> DFS();
         bool IsAcyclic();
         bool IsConnected();
@@ -36,41 +36,46 @@ namespace DewCore.Abstract.Graph
     {
         IGraph<V> Traspose();
         INodeList<V> Nodes { get; set; }
-        IGraph<V> AddVertex(INode<INodeList<V>, V> v);
-        INode<INodeList<V>, V> RemoveVertex(INode<INodeList<V>, V> v);
-        INode<INodeList<V>, V> RemoveVertex(Func<INode<INodeList<V>, V>, bool> predicate);
-        INode<INodeList<V>, V> GetVertex(IUid id);
-        INode<INodeList<V>, V> GetVertex(Func<INode<INodeList<V>, V>, bool> predicate);
+        IGraph<V> AddVertex(INode<IEdgeList<V>, V> v);
+        INode<IEdgeList<V>, V> RemoveVertex(INode<IEdgeList<V>, V> v);
+        INode<IEdgeList<V>, V> RemoveVertex(Func<INode<IEdgeList<V>, V>, bool> predicate);
+        INode<IEdgeList<V>, V> GetVertex(IUid id);
+        INode<IEdgeList<V>, V> GetVertex(Func<INode<IEdgeList<V>, V>, bool> predicate);
         IGraph<V> Reset();
     }
     public interface IUid : IComparable
     {
         long UniqueIdentifier { get; set; }
     }
-    public interface INode<T, V> where T : INodeList<V> 
+    public interface INode<T, V> where T : IEdgeList<V> 
     {
         IPathDecoration<V> PathDecoration { get; set; }
         V Value { get; set; }
         IUid Identifier { get; set; }
-        INodeList<V> Edges { get; set; }
+        IEdgeList<V> Edges { get; set; }
         INode<T, V> AddEdge(INode<T, V> edge);
-        INode<T, V> RemoveEdge(INode<T, V> edge);
-        INode<T, V> RemoveEdge(Func<INode<T, V>, bool> predicate);
+        IEdge<INode<T, V>> RemoveEdge(INode<T, V> edge);
+        IEdge<INode<T, V>> RemoveEdge(Func<INode<T, V>, bool> predicate);
     }
 
-    public interface IEdge<T> where T: INode<INodeList<T>, T>
+    public interface IEdge<T> 
     {
         double Weight { get; set; }
-        T Node { get; set; }
+        INode<IEdgeList<T>, T> Node { get; set; }
     }
 
-    public interface INodeList<V> : ICollection<INode<INodeList<V>,V>>
+    public interface INodeList<V> : ICollection<INode<IEdgeList<V>,V>>
     {
-        INode<INodeList<V>, V> GetNode(IUid id);
-        INode<INodeList<V>, V> RemoveNode(INode<INodeList<V>, V> item);
-        INode<INodeList<V>, V> RemoveNode(Func<INode<INodeList<V>, V>, bool> predicate);
+        INode<IEdgeList<V>, V> GetNode(IUid id);
+        INode<IEdgeList<V>, V> RemoveNode(INode<IEdgeList<V>, V> item);
+        INode<IEdgeList<V>, V> RemoveNode(Func<INode<IEdgeList<V>, V>, bool> predicate);
     }
-
+    public interface IEdgeList<V> : ICollection<IEdge<INode<IEdgeList<V>,V>>>
+    {
+        IEdge<INode<IEdgeList<V>, V>> GetEdge(IUid id);
+        IEdge<INode<IEdgeList<V>, V>> RemoveEdge(IEdge<INode<IEdgeList<V>, V>> item);
+        IEdge<INode<IEdgeList<V>, V>> RemoveEdge(Func<IEdge<INode<IEdgeList<V>, V>>, bool> predicate);
+    }
 
 
 }

@@ -7,7 +7,18 @@ using DewCore.Algorithms.Sort;
 
 namespace DewCore.Graph
 {
-
+    public class Edge<T> : IEdge<T>
+    {
+        public Edge()
+        {
+        }
+        public Edge(INode<IEdgeList<T>,T> node)
+        {
+            Node = node;
+        }
+        public INode<IEdgeList<T>, T> Node { get;set; }
+        public double Weight { get;set; }
+    }
     public class NodeDecoration<V> : IPathDecoration<V>
     {
         public ulong Distance { get; set; }
@@ -71,7 +82,7 @@ namespace DewCore.Graph
             return _nodes.GetEnumerator();
         }
 
-        public INode<INodeList<V>, V> GetNode(IUid id)
+        public INode<IEdgeList<V>, V> GetNode(IUid id)
         {
             if (_nodes.ContainsKey(id.UniqueIdentifier))
                 return _nodes[id.UniqueIdentifier];
@@ -89,7 +100,7 @@ namespace DewCore.Graph
             return result;
         }
 
-        public INode<INodeList<V>, V> RemoveNode(INode<INodeList<V>, V> item)
+        public INode<IEdgeList<V>, V> RemoveNode(INode<INodeList<V>, V> item)
         {
             INode<INodeList<V>, V> result = null;
             if (Contains(item))
@@ -101,7 +112,7 @@ namespace DewCore.Graph
             return result;
         }
 
-        public INode<INodeList<V>, V> RemoveNode(Func<INode<INodeList<V>, V>, bool> predicate)
+        public INode<IEdgeList<V>, V> RemoveNode(Func<INode<INodeList<V>, V>, bool> predicate)
         {
             INode<INodeList<V>, V> result = null;
             foreach (var item in _nodes)
@@ -117,7 +128,7 @@ namespace DewCore.Graph
             return result;
         }
 
-        IEnumerator<INode<INodeList<V>, V>> IEnumerable<INode<INodeList<V>, V>>.GetEnumerator()
+        IEnumerator<INode<IEdgeList<V>, V>> IEnumerable<INode<IEdgeList<V>, V>>.GetEnumerator()
         {
             return _nodes.Values.GetEnumerator();
         }
@@ -152,27 +163,27 @@ namespace DewCore.Graph
             return this;
         }
 
-        public INode<INodeList<V>, V> RemoveVertex(INode<INodeList<V>, V> v)
+        public INode<IEdgeList<V>, V> RemoveVertex(INode<IEdgeList<V>, V> v)
         {
             return _nodes.RemoveNode(v);
         }
 
-        public INode<INodeList<V>, V> RemoveVertex(Func<INode<INodeList<V>, V>, bool> predicate)
+        public INode<IEdgeList<V>, V> RemoveVertex(Func<INode<IEdgeList<V>, V>, bool> predicate)
         {
             return _nodes.RemoveNode(predicate);
         }
 
-        public INodeList<V> AStar(INode<INodeList<V>, V> start, INode<INodeList<V>, V> end)
+        public INodeList<V> AStar(INode<IEdgeList<V>, V> start, INode<IEdgeList<V>, V> end)
         {
             throw new NotImplementedException();
         }
 
-        public INodeList<V> WAStar(INode<INodeList<V>, V> start, INode<INodeList<V>, V> end)
+        public INodeList<V> WAStar(INode<IEdgeList<V>, V> start, INode<IEdgeList<V>, V> end)
         {
             throw new NotImplementedException();
         }
 
-        public INodeList<V> BFS(INode<INodeList<V>, V> start, INode<INodeList<V>, V> end)
+        public INodeList<V> BFS(INode<IEdgeList<V>, V> start, INode<IEdgeList<V>, V> end)
         {
             INodeList<V> result = new NodeList<V>();
             Dictionary<IUid, IUid> anchestors = new Dictionary<IUid, IUid>();
@@ -229,7 +240,7 @@ namespace DewCore.Graph
             return this;
         }
 
-        private void DFSVisit(INode<INodeList<V>, V> current, Dictionary<IUid, IUid> anchestors, ref uint time)
+        private void DFSVisit(INode<IEdgeList<V>, V> current, Dictionary<IUid, IUid> anchestors, ref uint time)
         {
             time++;
             current.PathDecoration.Discovered = time;
@@ -253,12 +264,12 @@ namespace DewCore.Graph
             current.PathDecoration.Closed = time;
         }
 
-        public INode<INodeList<V>, V> GetVertex(IUid id)
+        public INode<IEdgeList<V>, V> GetVertex(IUid id)
         {
             return _nodes.GetNode(id);
         }
 
-        public INode<INodeList<V>, V> GetVertex(Func<INode<INodeList<V>, V>, bool> predicate)
+        public INode<IEdgeList<V>, V> GetVertex(Func<INode<IEdgeList<V>, V>, bool> predicate)
         {
             INode<INodeList<V>, V> result = null;
             foreach (var item in _nodes)
@@ -272,7 +283,7 @@ namespace DewCore.Graph
             return result;
         }
 
-        public INodeList<V> ShortPathBFS(INode<INodeList<V>, V> start, INode<INodeList<V>, V> end)
+        public INodeList<V> ShortPathBFS(INode<IEdgeList<V>, V> start, INode<IEdgeList<V>, V> end)
         {
             INodeList<V> result = new NodeList<V>();
             Dictionary<IUid, IUid> anchestors = new Dictionary<IUid, IUid>();
@@ -368,12 +379,12 @@ namespace DewCore.Graph
             return trasposed;
         }
 
-        public INodeList<V> ShortPathDijkstra(INode<INodeList<V>, V> start, INode<INodeList<V>, V> end)
+        public INodeList<V> ShortPathDijkstra(INode<IEdgeList<V>, V> start, INode<IEdgeList<V>, V> end)
         {
             throw new NotImplementedException();
         }
 
-        public INodeList<V> Dijkstra(INode<INodeList<V>, V> start, INode<INodeList<V>, V> end)
+        public INodeList<V> Dijkstra(INode<IEdgeList<V>, V> start, INode<IEdgeList<V>, V> end)
         {
             //INodeList<V> result = new NodeList<V>();
             //Dictionary<IUid, IUid> anchestors = new Dictionary<IUid, IUid>();
@@ -422,30 +433,30 @@ namespace DewCore.Graph
             return null;
         }
     }
-    public class Node<T, V> : INode<INodeList<V>, V> where T : class, INodeList<V>, new()
+    public class Node<T, V> : INode<T,V> where T : class, IEdgeList<V>, new()
     {
-        private double _weight = 0;        
         public IPathDecoration<V> PathDecoration { get; set; } = new NodeDecoration<V>();
         private IUid _identifier = null;
         public IUid Identifier { get => _identifier; set => _identifier = value; }
-        private INodeList<V> _edges = new T();
-        public INodeList<V> Edges { get => _edges; set => _edges = value; }
+        private T _edges = new T();
+        public T Edges { get => _edges; set => _edges = value; }
         private V _value = default(V);
         public V Value { get => _value; set => _value = value; }
         public Node(IUid identifier) => _identifier = identifier;
         public Node(IUid identifier, double weight) { _identifier = identifier; _weight = weight; }
-        public INode<INodeList<V>, V> AddEdge(INode<INodeList<V>, V> edge)
+        public INode<T, V> AddEdge(INode<IEdgeList<V>, V> node, double weight = 0)
         {
+            var edge = new Edge<V>(node) as IEdge<INode<IEdgeList<V>,V>>;
             _edges.Add(edge);
             return this;
         }
-        public INode<INodeList<V>, V> RemoveEdge(INode<INodeList<V>, V> edge)
+        public IEdge<INode<IEdgeList<V>, V>> RemoveEdge(IEdge<INode<IEdgeList<V>, V>> edge)
         {
-            return _edges.RemoveNode(edge);
+            return _edges.RemoveEdge(edge);
         }
-        public INode<INodeList<V>, V> RemoveEdge(Func<INode<INodeList<V>, V>, bool> predicate)
+        public IEdge<INode<IEdgeList<V>, V>> RemoveEdge(Func<IEdge<INode<IEdgeList<V>, V>>, bool> predicate)
         {
-            return _edges.RemoveNode(predicate);
+            return _edges.RemoveEdge(predicate);
         }
         public override bool Equals(object obj)
         {
