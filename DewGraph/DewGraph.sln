@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.16
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DewGraph", "DewGraph\DewGraph.csproj", "{5FB684A7-FFBB-4148-A63D-8FFE08907B23}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example", "Example\Example.csproj", "{7C83FB06-4F7D-4B69-A98E-2C2EE2B725CC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5FB684A7-FFBB-4148-A63D-8FFE08907B23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5FB684A7-FFBB-4148-A63D-8FFE08907B23}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5FB684A7-FFBB-4148-A63D-8FFE08907B23}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5FB684A7-FFBB-4148-A63D-8FFE08907B23}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C83FB06-4F7D-4B69-A98E-2C2EE2B725CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C83FB06-4F7D-4B69-A98E-2C2EE2B725CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C83FB06-4F7D-4B69-A98E-2C2EE2B725CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C83FB06-4F7D-4B69-A98E-2C2EE2B725CC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8CAB9DFF-DC94-4EEA-A50F-903D81184957}
+	EndGlobalSection
+EndGlobal
