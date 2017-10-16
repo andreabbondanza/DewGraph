@@ -53,9 +53,9 @@ namespace DewCore.Abstract.Graph
         V Value { get; set; }
         IUid Identifier { get; set; }
         IEdgeList<V> Edges { get; set; }
-        INode<T, V> AddEdge(INode<T, V> edge);
-        IEdge<INode<T, V>> RemoveEdge(INode<T, V> edge);
-        IEdge<INode<T, V>> RemoveEdge(Func<INode<T, V>, bool> predicate);
+        INode<T, V> AddEdge(INode<T, V> edge, double weight = 0);
+        IEdge<V> RemoveEdge(IEdge<V> edge);
+        IEdge<V> RemoveEdge(Func<IEdge<V>>, bool> predicate);
     }
 
     public interface IEdge<T> 
@@ -70,12 +70,10 @@ namespace DewCore.Abstract.Graph
         INode<IEdgeList<V>, V> RemoveNode(INode<IEdgeList<V>, V> item);
         INode<IEdgeList<V>, V> RemoveNode(Func<INode<IEdgeList<V>, V>, bool> predicate);
     }
-    public interface IEdgeList<V> : ICollection<IEdge<INode<IEdgeList<V>,V>>>
+    public interface IEdgeList<V> : ICollection<IEdge<V>>
     {
-        IEdge<INode<IEdgeList<V>, V>> GetEdge(IUid id);
-        IEdge<INode<IEdgeList<V>, V>> RemoveEdge(IEdge<INode<IEdgeList<V>, V>> item);
-        IEdge<INode<IEdgeList<V>, V>> RemoveEdge(Func<IEdge<INode<IEdgeList<V>, V>>, bool> predicate);
+        IEdge<V> GetEdge(IUid id);
+        IEdge<V> RemoveEdge(IEdge<V> item);
+        IEdge<V> RemoveEdge(Func<IEdge<V>, bool> predicate);
     }
-
-
 }
