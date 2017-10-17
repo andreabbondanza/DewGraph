@@ -484,20 +484,56 @@ namespace DewCore.Graph
         {
             throw new NotImplementedException();
         }
+        private class TempEdge : IComparable
+        {
+            public INode<V> Node { get; set; }
+            public double Weight { get; set; }
+            public TempEdge(INode<V> node, double weight)
+            {
+                Node = node;
+                Weight = weight;
+            }
+            public int CompareTo(object obj)
+            {
+                var toCompare = (TempEdge)obj;
+                return toCompare.Weight == Weight ? 0 : (Weight > toCompare.Weight ? 1 : -1);
+            }
+        }
+        private double Dist(INode<V> start, INode<V> end)
+        {
+            return start.Edges.First(x => x.Node.Identifier.CompareTo(end.Identifier) == 0).Weight;
+        }
         public INodeList<V> Dijkstra(INode<V> start, INode<V> end)
         {
+            Dictionary<IUid, IUid> anchestors = new Dictionary<IUid, IUid>();
             Reset();
-            var set1 = new List<IUid>();
-            var set2 = new List<IUid>();
-            Dictionary<long, double> s = new Dictionary<long, double>();
+            var set1 = new List<TempEdge>();
+            var set2 = new List<TempEdge>();
             foreach (var item in _nodes)
             {
-                set2.Add(item.Identifier);
-                s.Add(item.Identifier.UniqueIdentifier, double.MaxValue);
-            }  
+                set2.Add(new TempEdge(item,double.MaxValue));
+            }
+            var first = set2.First(x => x.Node.Identifier.CompareTo(start.Identifier) == 0);
+            first.Weight = 0;
+            var sorter = HeapSort.GetSorter();
+            while(set2.Count > 0)
+            {
+                var curr = sorter.PerformHeapSortBaseType<TempEdge, List<TempEdge>>(set2, HeapSort.Order.Desc).First();
+                set1.Add(curr);
+                set2.Remove(curr);
+                if (curr.Weight == double.MaxValue)
+                    return null;
+                foreach (var item in curr.Node.Edges)
+                {
+                    var currdist = item.Weight + Dist(curr.Node,item.Node);
+                    if (currdist < item.Weight)
+                    {
+                        item.Weight = currdist;
+                        anchestors.Add(item.Node.Identifier, curr.Node.Identifier);
+                    }
+                }
+            }
             
-            
-
 
             //if (!anchestors.ContainsKey(end.Identifier))
             //    return null;
