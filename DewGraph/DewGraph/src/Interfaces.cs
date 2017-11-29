@@ -17,8 +17,8 @@ namespace DewCore.Abstract.Graph
         INodeList<V> ShortPathBFS(INode<V> start, INode<V> end);
         INodeList<V> AStar(INode<V> start, INode<V> end);
         INodeList<V> WAStar(INode<V> start, INode<V> end);
-        INodeList<V> BFS(INode<V> start, INode<V> end);
-        INodeList<V> Dijkstra(INode<V> start, INode<V> end);
+        INodeList<V> BFS(INode<V> start, Func<INode<V>, bool> predicate);
+        Dictionary<IUid, ulong> BFS(INode<V> start);
         IPath<V> DFS();
         bool IsAcyclic();
         bool IsConnected();

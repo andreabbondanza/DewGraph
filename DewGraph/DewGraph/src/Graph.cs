@@ -261,36 +261,30 @@ namespace DewCore.Graph
         {
             _nodes = list;
         }
-
         public IGraph<V> AddVertex(INode<V> v)
         {
             _nodes.Add(v);
             return this;
         }
-
         public INode<V> RemoveVertex(INode<V> v)
         {
             return _nodes.RemoveNode(v);
         }
-
         public INode<V> RemoveVertex(Func<INode<V>, bool> predicate)
         {
             return _nodes.RemoveNode(predicate);
         }
-
         public INodeList<V> AStar(INode<V> start, INode<V> end)
         {
             throw new NotImplementedException();
         }
-
         public INodeList<V> WAStar(INode<V> start, INode<V> end)
         {
             throw new NotImplementedException();
         }
-
-        public INodeList<V> BFS(INode<V> start, INode<V> end)
+        public Dictionary<IUid, ulong> BFS(INode<V> start)
         {
-            INodeList<V> result = new NodeList<V>();
+            Dictionary<IUid, ulong> distances = new Dictionary<IUid, ulong>();
             Dictionary<IUid, IUid> anchestors = new Dictionary<IUid, IUid>();
             Reset();
             start.PathDecoration.State = VertexState.Visited;
@@ -301,12 +295,13 @@ namespace DewCore.Graph
             while (queue.Count > 0)
             {
                 var u = queue.Dequeue();
+                distances.Add(u.Identifier, u.PathDecoration.Distance);
                 foreach (var v in u.Edges)
                 {
                     if (v.Node.PathDecoration.State == VertexState.Unvisited)
                     {
                         v.Node.PathDecoration.State = VertexState.Visited;
-                        v.Node.PathDecoration.Distance = u.PathDecoration.Distance;
+                        v.Node.PathDecoration.Distance = u.PathDecoration.Distance + 1;
                         v.Node.PathDecoration.AncestorIdentifier = u.Identifier;
                         anchestors.Add(v.Node.Identifier, u.Identifier);
                         v.Node.PathDecoration.AncestorIdentifier = u.Identifier;
@@ -315,22 +310,40 @@ namespace DewCore.Graph
                 }
                 u.PathDecoration.State = VertexState.Closed;
             }
-            if (!anchestors.ContainsKey(end.Identifier))
-                return null;
-            else
+            return distances;
+        }
+        public INodeList<V> BFS(INode<V> start, Func<INode<V>, bool> predicate = null)
+        {
+            INodeList<V> result = new NodeList<V>();
+            predicate = predicate ?? new Func<INode<V>, bool>((node) => true);
+            Dictionary<IUid, IUid> anchestors = new Dictionary<IUid, IUid>();
+            Reset();
+            start.PathDecoration.State = VertexState.Visited;
+            start.PathDecoration.Distance = 0;
+            start.PathDecoration.AncestorIdentifier = null;
+            Queue<INode<V>> queue = new Queue<INode<V>>();
+            queue.Enqueue(start);
+            while (queue.Count > 0)
             {
-                var current = end;
-                while (current != start)
+                var u = queue.Dequeue();
+                if (predicate(u))
+                    result.Add(u);
+                foreach (var v in u.Edges)
                 {
-                    result.Add(current);
-                    var currId = anchestors[current.Identifier];
-                    current = _nodes.GetNode(currId);
+                    if (v.Node.PathDecoration.State == VertexState.Unvisited)
+                    {
+                        v.Node.PathDecoration.State = VertexState.Visited;
+                        v.Node.PathDecoration.Distance = u.PathDecoration.Distance + 1;
+                        v.Node.PathDecoration.AncestorIdentifier = u.Identifier;
+                        anchestors.Add(v.Node.Identifier, u.Identifier);
+                        v.Node.PathDecoration.AncestorIdentifier = u.Identifier;
+                        queue.Enqueue(v.Node);
+                    }
                 }
-                result.Add(start);
+                u.PathDecoration.State = VertexState.Closed;
             }
             return result;
         }
-
         public IPath<V> DFS()
         {
             INodeList<V> result = new NodeList<V>();
@@ -344,7 +357,6 @@ namespace DewCore.Graph
             }
             return this;
         }
-
         private void DFSVisit(INode<V> current, Dictionary<IUid, IUid> anchestors, ref uint time)
         {
             time++;
@@ -368,12 +380,10 @@ namespace DewCore.Graph
             time++;
             current.PathDecoration.Closed = time;
         }
-
         public INode<V> GetVertex(IUid id)
         {
             return _nodes.GetNode(id);
         }
-
         public INode<V> GetVertex(Func<INode<V>, bool> predicate)
         {
             INode<V> result = null;
@@ -387,7 +397,6 @@ namespace DewCore.Graph
             }
             return result;
         }
-
         public INodeList<V> ShortPathBFS(INode<V> start, INode<V> end)
         {
             INodeList<V> result = new NodeList<V>();
@@ -408,7 +417,7 @@ namespace DewCore.Graph
                     if (v.Node.PathDecoration.State == VertexState.Unvisited)
                     {
                         v.Node.PathDecoration.State = VertexState.Visited;
-                        v.Node.PathDecoration.Distance = u.PathDecoration.Distance;
+                        v.Node.PathDecoration.Distance = u.PathDecoration.Distance + 1;
                         v.Node.PathDecoration.AncestorIdentifier = u.Identifier;
                         anchestors.Add(v.Node.Identifier, u.Identifier);
                         queue.Enqueue(v.Node);
@@ -482,7 +491,51 @@ namespace DewCore.Graph
         }
         public INodeList<V> ShortPathDijkstra(INode<V> start, INode<V> end)
         {
-            throw new NotImplementedException();
+            Dictionary<IUid, IUid> anchestors = new Dictionary<IUid, IUid>();
+            Reset();
+            var set1 = new List<TempEdge>();
+            var set2 = new List<TempEdge>();
+            foreach (var item in _nodes)
+            {
+                set2.Add(new TempEdge(item, double.MaxValue));
+            }
+            var first = set2.First(x => x.Node.Identifier.CompareTo(start.Identifier) == 0);
+            first.Weight = 0;
+            var sorter = HeapSort.GetSorter();
+            while (set2.Count > 0)
+            {
+                var curr = sorter.PerformHeapSortBaseType<TempEdge, List<TempEdge>>(set2, HeapSort.Order.Desc).First();
+                set1.Add(curr);
+                set2.Remove(curr);
+                if (curr.Weight == double.MaxValue)
+                    return null;
+                foreach (var item in curr.Node.Edges)
+                {
+                    var currdist = curr.Weight + Dist(curr.Node, item.Node);
+                    if (currdist < item.Weight)
+                    {
+                        item.Weight = currdist;
+                        anchestors.Add(item.Node.Identifier, curr.Node.Identifier);
+                    }
+                }
+            }
+
+
+            //if (!anchestors.ContainsKey(end.Identifier))
+            //    return null;
+            //else
+            //{
+            //    var current = end;
+            //    while (current != start)
+            //    {
+            //        result.Add(current);
+            //        var currId = anchestors[current.Identifier];
+            //        current = _nodes.GetNode(currId);
+            //    }
+            //    result.Add(start);
+            //}
+            //return result;
+            return null;
         }
         private class TempEdge : IComparable
         {
@@ -502,54 +555,6 @@ namespace DewCore.Graph
         private double Dist(INode<V> start, INode<V> end)
         {
             return start.Edges.First(x => x.Node.Identifier.CompareTo(end.Identifier) == 0).Weight;
-        }
-        public INodeList<V> Dijkstra(INode<V> start, INode<V> end)
-        {
-            Dictionary<IUid, IUid> anchestors = new Dictionary<IUid, IUid>();
-            Reset();
-            var set1 = new List<TempEdge>();
-            var set2 = new List<TempEdge>();
-            foreach (var item in _nodes)
-            {
-                set2.Add(new TempEdge(item,double.MaxValue));
-            }
-            var first = set2.First(x => x.Node.Identifier.CompareTo(start.Identifier) == 0);
-            first.Weight = 0;
-            var sorter = HeapSort.GetSorter();
-            while(set2.Count > 0)
-            {
-                var curr = sorter.PerformHeapSortBaseType<TempEdge, List<TempEdge>>(set2, HeapSort.Order.Desc).First();
-                set1.Add(curr);
-                set2.Remove(curr);
-                if (curr.Weight == double.MaxValue)
-                    return null;
-                foreach (var item in curr.Node.Edges)
-                {
-                    var currdist = item.Weight + Dist(curr.Node,item.Node);
-                    if (currdist < item.Weight)
-                    {
-                        item.Weight = currdist;
-                        anchestors.Add(item.Node.Identifier, curr.Node.Identifier);
-                    }
-                }
-            }
-            
-
-            //if (!anchestors.ContainsKey(end.Identifier))
-            //    return null;
-            //else
-            //{
-            //    var current = end;
-            //    while (current != start)
-            //    {
-            //        result.Add(current);
-            //        var currId = anchestors[current.Identifier];
-            //        current = _nodes.GetNode(currId);
-            //    }
-            //    result.Add(start);
-            //}
-            //return result;
-            return null;
         }
     }
     public class Node<V> : INode<V>
