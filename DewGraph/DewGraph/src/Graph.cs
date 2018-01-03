@@ -7,35 +7,84 @@ using DewCore.Algorithms.Sort;
 
 namespace DewCore.Graph
 {
+    /// <summary>
+    /// Edge class
+    /// </summary>
+    /// <typeparam name="V"></typeparam>
     public class Edge<V> : IEdge<V>
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public Edge()
         {
         }
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="node"></param>
         public Edge(INode<V> node)
         {
             Node = node;
         }
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="weight"></param>
         public Edge(INode<V> node, double weight)
         {
             Node = node;
             Weight = weight;
         }
+        /// <summary>
+        /// Node
+        /// </summary>
         public INode<V> Node { get; set; }
+        /// <summary>
+        /// Weight
+        /// </summary>
         public double Weight { get; set; } = double.MaxValue;
+        /// <summary>
+        /// Compare
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public int CompareTo(object obj)
         {
             var toCompare = obj as Edge<V>;
             return toCompare.Weight == Weight ? 0 : (Weight > toCompare.Weight ? 1 : -1);
         }
     }
+    /// <summary>
+    /// Node decoration
+    /// </summary>
+    /// <typeparam name="V"></typeparam>
     public class NodeDecoration<V> : IPathDecoration<V>
     {
+        /// <summary>
+        /// Distance from source
+        /// </summary>
         public ulong Distance { get; set; }
+        /// <summary>
+        /// Current vertex state
+        /// </summary>
         public VertexState State { get; set; } = VertexState.Unvisited;
+        /// <summary>
+        /// Anchestor IUid
+        /// </summary>
         public IUid AncestorIdentifier { get; set; }
+        /// <summary>
+        /// Discovered time
+        /// </summary>
         public uint Discovered { get; set; }
+        /// <summary>
+        /// Closed time
+        /// </summary>
         public uint Closed { get; set; }
+        /// <summary>
+        /// Reset
+        /// </summary>
         public void Reset()
         {
             State = VertexState.Unvisited;
@@ -45,33 +94,63 @@ namespace DewCore.Graph
             Discovered = 0;
         }
     }
-
+    /// <summary>
+    /// Edge list
+    /// </summary>
+    /// <typeparam name="V"></typeparam>
     public class EdgeList<V> : IEdgeList<V>
     {
         private Dictionary<long, IEdge<V>> _nodes = new Dictionary<long, IEdge<V>>();
+        /// <summary>
+        /// Edge count
+        /// </summary>
         public int Count => _nodes.Count;
+        /// <summary>
+        /// IsSyncronized
+        /// </summary>
         public bool IsSynchronized => false;
+        /// <summary>
+        /// IsReadOnly
+        /// </summary>
         public bool IsReadOnly => false;
+        /// <summary>
+        /// Add a new edge
+        /// </summary>
+        /// <param name="item"></param>
         public void Add(IEdge<V> item)
         {
             _nodes.Add(item.Node.Identifier.UniqueIdentifier, item);
         }
-
+        /// <summary>
+        /// Clear collection
+        /// </summary>
         public void Clear()
         {
             _nodes.Clear();
         }
-
+        /// <summary>
+        /// Contains
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
         public bool Contains(IEdge<V> item)
         {
             return _nodes.ContainsKey(item.Node.Identifier.UniqueIdentifier);
         }
-
+        /// <summary>
+        /// CopyTo
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="index"></param>
         public void CopyTo(Array array, int index)
         {
             throw new NotImplementedException();
         }
-
+        /// <summary>
+        /// CopyTo
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="arrayIndex"></param>
         public void CopyTo(IEdge<V>[] array, int arrayIndex)
         {
             if (array == null)
@@ -84,12 +163,19 @@ namespace DewCore.Graph
                 array[i++] = item.Value;
             }
         }
-
+        /// <summary>
+        /// Get enumerator
+        /// </summary>
+        /// <returns></returns>
         public IEnumerator GetEnumerator()
         {
             return _nodes.GetEnumerator();
         }
-
+        /// <summary>
+        /// Get an Edge
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public IEdge<V> GetEdge(IUid id)
         {
             if (_nodes.ContainsKey(id.UniqueIdentifier))
@@ -97,7 +183,11 @@ namespace DewCore.Graph
             else
                 return null;
         }
-
+        /// <summary>
+        /// Remove
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
         public bool Remove(IEdge<V> item)
         {
             bool result = false;
@@ -107,7 +197,11 @@ namespace DewCore.Graph
             }
             return result;
         }
-
+        /// <summary>
+        /// Remove edge
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
         public IEdge<V> RemoveEdge(IEdge<V> item)
         {
             IEdge<V> result = null;
@@ -118,7 +212,11 @@ namespace DewCore.Graph
             }
             return result;
         }
-
+        /// <summary>
+        /// Remove edge with predicate
+        /// </summary>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
         public IEdge<V> RemoveEdge(Func<IEdge<V>, bool> predicate)
         {
             IEdge<V> result = null;
@@ -133,42 +231,72 @@ namespace DewCore.Graph
             }
             return result;
         }
-
+        /// <summary>
+        /// Get enumerator
+        /// </summary>
+        /// <returns></returns>
         IEnumerator<IEdge<V>> IEnumerable<IEdge<V>>.GetEnumerator()
         {
             return _nodes.Values.GetEnumerator();
         }
     }
-
+    /// <summary>
+    /// Node list
+    /// </summary>
+    /// <typeparam name="V"></typeparam>
     public class NodeList<V> : INodeList<V>
     {
         private Dictionary<long, INode<V>> _nodes = new Dictionary<long, INode<V>>();
+        /// <summary>
+        /// Node count
+        /// </summary>
         public int Count => _nodes.Count;
-
+        /// <summary>
+        /// Is Syncronized
+        /// </summary>
         public bool IsSynchronized => false;
-
+        /// <summary>
+        /// Is readonly
+        /// </summary>
         public bool IsReadOnly => false;
-
+        /// <summary>
+        /// Add new vertex
+        /// </summary>
+        /// <param name="item"></param>
         public void Add(INode<V> item)
         {
             _nodes.Add(item.Identifier.UniqueIdentifier, item);
         }
-
+        /// <summary>
+        /// Clear nodelist
+        /// </summary>
         public void Clear()
         {
             _nodes.Clear();
         }
-
+        /// <summary>
+        /// Check contains
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
         public bool Contains(INode<V> item)
         {
             return _nodes.ContainsKey(item.Identifier.UniqueIdentifier);
         }
-
+        /// <summary>
+        /// Copy to
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="index"></param>
         public void CopyTo(Array array, int index)
         {
             throw new NotImplementedException();
         }
-
+        /// <summary>
+        /// Copyto
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="arrayIndex"></param>
         public void CopyTo(INode<V>[] array, int arrayIndex)
         {
             if (array == null)
@@ -181,12 +309,19 @@ namespace DewCore.Graph
                 array[i++] = item.Value;
             }
         }
-
+        /// <summary>
+        /// Get enumerator
+        /// </summary>
+        /// <returns></returns>
         public IEnumerator GetEnumerator()
         {
             return _nodes.GetEnumerator();
         }
-
+        /// <summary>
+        /// Get node by IUid
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public INode<V> GetNode(IUid id)
         {
             if (_nodes.ContainsKey(id.UniqueIdentifier))
@@ -194,7 +329,11 @@ namespace DewCore.Graph
             else
                 return null;
         }
-
+        /// <summary>
+        /// Remove node with bool return
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
         public bool Remove(INode<V> item)
         {
             bool result = false;
@@ -204,7 +343,11 @@ namespace DewCore.Graph
             }
             return result;
         }
-
+        /// <summary>
+        /// Remove node with node return
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
         public INode<V> RemoveNode(INode<V> item)
         {
             INode<V> result = null;
@@ -216,7 +359,11 @@ namespace DewCore.Graph
             }
             return result;
         }
-
+        /// <summary>
+        /// Remove node with predicate
+        /// </summary>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
         public INode<V> RemoveNode(Func<INode<V>, bool> predicate)
         {
             INode<V> result = null;
@@ -232,12 +379,19 @@ namespace DewCore.Graph
             }
             return result;
         }
-
+        /// <summary>
+        /// Return enumerator
+        /// </summary>
+        /// <returns></returns>
         IEnumerator<INode<V>> IEnumerable<INode<V>>.GetEnumerator()
         {
             return _nodes.Values.GetEnumerator();
         }
     }
+    /// <summary>
+    /// Graph object
+    /// </summary>
+    /// <typeparam name="V"></typeparam>
     public class Graph<V> : IGraph<V>, IPath<V>
     {
         private class OrderHelpType : IComparable
@@ -256,20 +410,42 @@ namespace DewCore.Graph
         }
         private bool _acyclic = true;
         private INodeList<V> _nodes = null;
+        /// <summary>
+        /// Graph node list
+        /// </summary>
         public INodeList<V> Nodes { get => _nodes; set => _nodes = value; }
+        /// <summary>
+        /// Graph constructor
+        /// </summary>
+        /// <param name="list"></param>
         public Graph(INodeList<V> list)
         {
             _nodes = list;
         }
+        /// <summary>
+        /// Add a new vertex to a graph
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
         public IGraph<V> AddVertex(INode<V> v)
         {
             _nodes.Add(v);
             return this;
         }
+        /// <summary>
+        /// Remove vertex from graph
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
         public INode<V> RemoveVertex(INode<V> v)
         {
             return _nodes.RemoveNode(v);
         }
+        /// <summary>
+        /// Remove vertex with predicate
+        /// </summary>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
         public INode<V> RemoveVertex(Func<INode<V>, bool> predicate)
         {
             return _nodes.RemoveNode(predicate);
@@ -441,11 +617,19 @@ namespace DewCore.Graph
             }
             return result;
         }
+        /// <summary>
+        /// Check if graph is acyclic
+        /// </summary>
+        /// <returns></returns>
         public bool IsAcyclic()
         {
             DFS();
             return _acyclic;
         }
+        /// <summary>
+        /// Check if graph is connected
+        /// </summary>
+        /// <returns></returns>
         public bool IsConnected()
         {
             if (_nodes.Count > 0)
@@ -464,6 +648,10 @@ namespace DewCore.Graph
             }
             return true;
         }
+        /// <summary>
+        /// Reset graph
+        /// </summary>
+        /// <returns></returns>
         public IGraph<V> Reset()
         {
             foreach (var item in _nodes)
@@ -472,6 +660,10 @@ namespace DewCore.Graph
             }
             return this;
         }
+        /// <summary>
+        /// Traspose graph
+        /// </summary>
+        /// <returns></returns>
         public IGraph<V> Traspose()
         {
             var trasposed = new Graph<V>(new NodeList<V>());
@@ -489,6 +681,12 @@ namespace DewCore.Graph
             }
             return trasposed;
         }
+        /// <summary>
+        /// Get short path between two nodes with Dijkstra
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <returns></returns>
         public INodeList<V> ShortPathDijkstra(INode<V> start, INode<V> end)
         {
             Dictionary<IUid, IUid> anchestors = new Dictionary<IUid, IUid>();
@@ -557,16 +755,45 @@ namespace DewCore.Graph
             return start.Edges.First(x => x.Node.Identifier.CompareTo(end.Identifier) == 0).Weight;
         }
     }
+    /// <summary>
+    /// Node class
+    /// </summary>
+    /// <typeparam name="V"></typeparam>
     public class Node<V> : INode<V>
     {
+        /// <summary>
+        /// Path decoration
+        /// </summary>
         public IPathDecoration<V> PathDecoration { get; set; } = new NodeDecoration<V>();
+        /// <summary>
+        /// Node identifier
+        /// </summary>
         private IUid _identifier = null;
+        /// <summary>
+        /// Node identifier
+        /// </summary>
         public IUid Identifier { get => _identifier; set => _identifier = value; }
         private IEdgeList<V> _edges = new EdgeList<V>();
+        /// <summary>
+        /// The edges list
+        /// </summary>
         public IEdgeList<V> Edges { get => _edges; set => _edges = value; }
         private V _value = default(V);
+        /// <summary>
+        /// Node value
+        /// </summary>
         public V Value { get => _value; set => _value = value; }
+        /// <summary>
+        /// Node constructor
+        /// </summary>
+        /// <param name="identifier"></param>
         public Node(IUid identifier) => _identifier = identifier;
+        /// <summary>
+        /// Add edge to node
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="weight"></param>
+        /// <returns></returns>
         public INode<V> AddEdge(INode<V> node, double weight = 0)
         {
             var n = node as INode<V>;
@@ -574,41 +801,87 @@ namespace DewCore.Graph
             _edges.Add(edge);
             return this;
         }
+        /// <summary>
+        /// Equals
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public override bool Equals(object obj)
         {
             var node = obj as Node<V>;
             return node != null &&
                    EqualityComparer<IUid>.Default.Equals(_identifier, node._identifier);
         }
+        /// <summary>
+        /// Get hash code
+        /// </summary>
+        /// <returns></returns>
         public override int GetHashCode()
         {
             return 1278429765 + EqualityComparer<IUid>.Default.GetHashCode(_identifier);
         }
+        /// <summary>
+        /// Remove edge
+        /// </summary>
+        /// <param name="edge"></param>
+        /// <returns></returns>
         public IEdge<V> RemoveEdge(IEdge<V> edge)
         {
             return _edges.RemoveEdge(edge);
         }
+        /// <summary>
+        /// Remove edge with predicate
+        /// </summary>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
         public IEdge<V> RemoveEdge(Func<IEdge<V>, bool> predicate)
         {
             return _edges.RemoveEdge(predicate);
         }
+        /// <summary>
+        /// Compare
+        /// </summary>
+        /// <param name="node1"></param>
+        /// <param name="node2"></param>
+        /// <returns></returns>
         public static bool operator ==(Node<V> node1, Node<V> node2)
         {
             return node1.Identifier.CompareTo(node2.Identifier) == 0;
         }
+        /// <summary>
+        /// Compare
+        /// </summary>
+        /// <param name="node1"></param>
+        /// <param name="node2"></param>
+        /// <returns></returns>
         public static bool operator !=(Node<V> node1, Node<V> node2)
         {
             return node1.Identifier.CompareTo(node2.Identifier) != 0;
         }
     }
+    /// <summary>
+    /// A node identifier
+    /// </summary>
     public class NodeIdentifier : IUid
     {
+        /// <summary>
+        /// Identifier
+        /// </summary>
         public long UniqueIdentifier { get; set; }
+        /// <summary>
+        /// Identifier comparator
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public int CompareTo(object obj)
         {
             var id = obj as IUid;
             return id.UniqueIdentifier == UniqueIdentifier ? 0 : (id.UniqueIdentifier < 0 ? -1 : 1);
         }
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="id"></param>
         public NodeIdentifier(long id) { UniqueIdentifier = id; }
     }
 }
