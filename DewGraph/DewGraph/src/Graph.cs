@@ -774,7 +774,7 @@ namespace DewCore.Graph
         /// <summary>
         /// Return a topological sort 
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Node list, else null if can't be sorted</returns>
         public ICollection<INode<V>> GetTopologicalSort()
         {
             Dictionary<IUid, ulong> nodes = new Dictionary<IUid, ulong>();
@@ -798,6 +798,10 @@ namespace DewCore.Graph
                         }
                         result.Add(node);
                     }
+                }
+                else
+                {
+                    return null;
                 }
             }
             return result;
