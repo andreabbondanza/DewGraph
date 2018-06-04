@@ -488,6 +488,12 @@ namespace DewCore.Graph
             }
             return distances;
         }
+        /// <summary>
+        /// Navigate into the graph and return all nodes that satisfy a predicate
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
         public INodeList<V> BFS(INode<V> start, Func<INode<V>, bool> predicate = null)
         {
             INodeList<V> result = new NodeList<V>();
@@ -520,6 +526,10 @@ namespace DewCore.Graph
             }
             return result;
         }
+        /// <summary>
+        /// Execute the DFS
+        /// </summary>
+        /// <returns></returns>
         public IPath<V> DFS()
         {
             INodeList<V> result = new NodeList<V>();
@@ -556,10 +566,20 @@ namespace DewCore.Graph
             time++;
             current.PathDecoration.Closed = time;
         }
+        /// <summary>
+        /// Return the vertex with UID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public INode<V> GetVertex(IUid id)
         {
             return _nodes.GetNode(id);
         }
+        /// <summary>
+        /// Return the first vertex with the predicate
+        /// </summary>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
         public INode<V> GetVertex(Func<INode<V>, bool> predicate)
         {
             INode<V> result = null;
@@ -573,6 +593,12 @@ namespace DewCore.Graph
             }
             return result;
         }
+        /// <summary>
+        /// Return the shortest path between two nodes
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <returns></returns>
         public INodeList<V> ShortPathBFS(INode<V> start, INode<V> end)
         {
             INodeList<V> result = new NodeList<V>();
