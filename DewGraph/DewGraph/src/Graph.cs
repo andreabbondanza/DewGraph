@@ -473,13 +473,128 @@ namespace DewCore.Graph
         {
             return _nodes.RemoveNode(predicate);
         }
-        public INodeList<V> AStar(INode<V> start, INode<V> end)
+        /// <summary>
+        /// Shortest path with A*
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <param name="heuristic"></param>
+        /// <returns></returns>
+        public INodeList<V> AStar(INode<V> start, INode<V> end, Func<INode<V>, INode<V>, double> heuristic)
         {
-            throw new NotImplementedException();
+            heuristic = heuristic ?? ((x, y) => 0);
+            var result = new NodeList<V>();
+            Dictionary<IUid, IUid> anchestors = new Dictionary<IUid, IUid>();
+            Dictionary<IUid, double> dist = new Dictionary<IUid, double>();
+            Reset();
+            var queue = new List<TempEdge>();
+            foreach (var item in _nodes)
+            {
+                queue.Add(new TempEdge(item, double.MaxValue));
+                dist.Add(item.Identifier, double.MaxValue);
+            }
+            var first = queue.First(x => x.Node.Identifier.CompareTo(start.Identifier) == 0);
+            first.Weight = 0;
+            dist[first.Node.Identifier] = 0;
+            var sorter = HeapSort.GetSorter();
+            while (queue.Count > 0)
+            {
+                var sorted = sorter.PerformHeapSortBaseType<TempEdge, List<TempEdge>>(queue, HeapSort.Order.Asc);
+                var curr = sorted.First();
+                queue.Remove(curr);
+                if (curr.Weight == double.MaxValue)
+                    return null;
+                foreach (var item in curr.Node.Edges)
+                {
+                    var currW = curr.Weight + EWeight(curr.Node, item.Node) + heuristic(item.Node, end);
+                    if (currW < dist[item.Node.Identifier])
+                    {
+                        item.Weight = currW;
+                        if (anchestors.ContainsKey(item.Node.Identifier))
+                            anchestors[item.Node.Identifier] = curr.Node.Identifier;
+                        else
+                            anchestors.Add(item.Node.Identifier, curr.Node.Identifier);
+                        dist[item.Node.Identifier] = currW;
+                        queue.First(x => x.Node.Identifier == item.Node.Identifier).Weight = currW;
+                    }
+                }
+            }
+            if (!anchestors.ContainsKey(end.Identifier))
+                return null;
+            else
+            {
+                var current = end;
+                while (current != start)
+                {
+                    result.Add(current);
+                    var currId = anchestors[current.Identifier];
+                    current = _nodes.GetNode(currId);
+                }
+                result.Add(start);
+            }
+            return result;
         }
-        public INodeList<V> WAStar(INode<V> start, INode<V> end)
+        /// <summary>
+        /// Shortest path with weighted A*
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <param name="heuristic"></param>
+        /// <param name="epsilon"></param>
+        /// <returns></returns>
+        public INodeList<V> WAStar(INode<V> start, INode<V> end, Func<INode<V>, INode<V>, double> heuristic, double epsilon = 1)
         {
-            throw new NotImplementedException();
+            heuristic = heuristic ?? ((x, y) => 0);
+            var result = new NodeList<V>();
+            Dictionary<IUid, IUid> anchestors = new Dictionary<IUid, IUid>();
+            Dictionary<IUid, double> dist = new Dictionary<IUid, double>();
+            Reset();
+            var queue = new List<TempEdge>();
+            foreach (var item in _nodes)
+            {
+                queue.Add(new TempEdge(item, double.MaxValue));
+                dist.Add(item.Identifier, double.MaxValue);
+            }
+            var first = queue.First(x => x.Node.Identifier.CompareTo(start.Identifier) == 0);
+            first.Weight = 0;
+            dist[first.Node.Identifier] = 0;
+            var sorter = HeapSort.GetSorter();
+            while (queue.Count > 0)
+            {
+                var sorted = sorter.PerformHeapSortBaseType<TempEdge, List<TempEdge>>(queue, HeapSort.Order.Asc);
+                var curr = sorted.First();
+                queue.Remove(curr);
+                if (curr.Weight == double.MaxValue)
+                    return null;
+                foreach (var item in curr.Node.Edges)
+                {
+                    var currW = curr.Weight + EWeight(curr.Node, item.Node) + (heuristic(item.Node, end) * epsilon);
+                    if (currW < dist[item.Node.Identifier])
+                    {
+                        item.Weight = currW;
+                        if (anchestors.ContainsKey(item.Node.Identifier))
+                            anchestors[item.Node.Identifier] = curr.Node.Identifier;
+                        else
+                            anchestors.Add(item.Node.Identifier, curr.Node.Identifier);
+                        dist[item.Node.Identifier] = currW;
+                        queue.First(x => x.Node.Identifier == item.Node.Identifier).Weight = currW;
+                    }
+                }
+            }
+            if (!anchestors.ContainsKey(end.Identifier))
+                return null;
+            else
+            {
+                var current = end;
+                while (current != start)
+                {
+                    result.Add(current);
+                    var currId = anchestors[current.Identifier];
+                    current = _nodes.GetNode(currId);
+                }
+                result.Add(start);
+            }
+            return result;
         }
         /// <summary>
         /// Execute bfs and return all nodes that satisfy the predicate
@@ -883,8 +998,10 @@ namespace DewCore.Graph
         {
             var n = node as INode<V>;
             this.PathDecoration.Out++;
-            var edge = new Edge<V>(n);
-            edge.Weight = weight;
+            var edge = new Edge<V>(n)
+            {
+                Weight = weight
+            };
             _edges.Add(edge);
             return this;
         }

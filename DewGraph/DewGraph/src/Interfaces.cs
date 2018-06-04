@@ -48,15 +48,18 @@ namespace DewCore.Abstract.Graph
         /// </summary>
         /// <param name="start"></param>
         /// <param name="end"></param>
+        /// <param name="heuristic">Heuristic function</param>
         /// <returns></returns>
-        INodeList<V> AStar(INode<V> start, INode<V> end);
+        INodeList<V> AStar(INode<V> start, INode<V> end, Func<INode<V>, INode<V>, double> heuristic);
         /// <summary>
         /// Get optimal path with AStar alghoritm
         /// </summary>
         /// <param name="start"></param>
         /// <param name="end"></param>
+        /// <param name="heuristic">Heuristic function</param>
+        /// <param name="epsilon"></param>
         /// <returns></returns>
-        INodeList<V> WAStar(INode<V> start, INode<V> end);
+        INodeList<V> WAStar(INode<V> start, INode<V> end, Func<INode<V>, INode<V>, double> heuristic, double epsilon);
         /// <summary>
         /// Navigate graph with a predicate to flag a list of nodes returned
         /// </summary>
