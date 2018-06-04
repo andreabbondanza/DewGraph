@@ -8,7 +8,7 @@ namespace DewCore.Abstract.Graph
     /// <summary>
     /// Vertex state
     /// </summary>
-    public enum VertexState
+    public enum NodeState
     {
         /// <summary>
         /// Unvisited flag
@@ -65,12 +65,6 @@ namespace DewCore.Abstract.Graph
         /// <returns></returns>
         INodeList<V> BFS(INode<V> start, Func<INode<V>, bool> predicate);
         /// <summary>
-        /// Navigate graph and return the reachable nodes
-        /// </summary>
-        /// <param name="start"></param>
-        /// <returns></returns>
-        Dictionary<IUid, ulong> BFS(INode<V> start);
-        /// <summary>
         /// NAvigate graph with DFS, after this you can use IsAcyclic and IsConnected functions
         /// </summary>
         /// <returns></returns>
@@ -85,6 +79,24 @@ namespace DewCore.Abstract.Graph
         /// </summary>
         /// <returns></returns>
         bool IsConnected();
+        /// <summary>
+        /// Return a topological order
+        /// </summary>
+        /// <returns></returns>
+        ICollection<INode<V>> GetTopologicalSort();
+        /// <summary>
+        /// Return strong connected components
+        /// </summary>
+        /// <returns></returns>
+        ICollection<IGraph<V>> GetStronglyConnectedComponents();
+    }
+    /// <summary>
+    /// Graph interface
+    /// </summary>
+    /// <typeparam name="V"></typeparam>
+    public interface IGraph<V> : IBaseGraph<V>, IPath<V>
+    {
+
     }
     /// <summary>
     /// Decoration for vertex for path navigation
@@ -93,13 +105,25 @@ namespace DewCore.Abstract.Graph
     public interface IPathDecoration<V>
     {
         /// <summary>
+        /// Node's order
+        /// </summary>
+        ulong Grade { get; }
+        /// <summary>
+        /// In vertex
+        /// </summary>
+        ulong In { get; set; }
+        /// <summary>
+        /// Out vertex
+        /// </summary>
+        ulong Out { get; set; }
+        /// <summary>
         /// Distance between source
         /// </summary>
         ulong Distance { get; set; }
         /// <summary>
         /// Current vertext state
         /// </summary>
-        VertexState State { get; set; }
+        NodeState State { get; set; }
         /// <summary>
         /// Vertex uid parent
         /// </summary>
@@ -107,11 +131,11 @@ namespace DewCore.Abstract.Graph
         /// <summary>
         /// Discovered time
         /// </summary>
-        uint Discovered { get; set; }
+        ulong Discovered { get; set; }
         /// <summary>
         /// Closed time
         /// </summary>
-        uint Closed { get; set; }
+        ulong Closed { get; set; }
         /// <summary>
         /// Reset node
         /// </summary>
@@ -121,13 +145,13 @@ namespace DewCore.Abstract.Graph
     /// Graph interface
     /// </summary>
     /// <typeparam name="V"></typeparam>
-    public interface IGraph<V>
+    public interface IBaseGraph<V>
     {
         /// <summary>
         /// Get the trasposted graph
         /// </summary>
         /// <returns></returns>
-        IGraph<V> Traspose();
+        IBaseGraph<V> Traspose();
         /// <summary>
         /// Graph node list
         /// </summary>
@@ -137,36 +161,36 @@ namespace DewCore.Abstract.Graph
         /// </summary>
         /// <param name="v"></param>
         /// <returns></returns>
-        IGraph<V> AddVertex(INode<V> v);
+        IBaseGraph<V> AddNode(INode<V> v);
         /// <summary>
         /// Remove a vertext from the graph
         /// </summary>
         /// <param name="v"></param>
         /// <returns></returns>
-        INode<V> RemoveVertex(INode<V> v);
+        INode<V> RemoveNode(INode<V> v);
         /// <summary>
         /// Remove vertex with predicate for condition
         /// </summary>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        INode<V> RemoveVertex(Func<INode<V>, bool> predicate);
+        INode<V> RemoveNode(Func<INode<V>, bool> predicate);
         /// <summary>
         /// Return a vertex with an IUid
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        INode<V> GetVertex(IUid id);
+        INode<V> GetNode(IUid id);
         /// <summary>
-        /// Get the first vertex that satisfy the predicate
+        /// Get nodes that satisfy the predicate
         /// </summary>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        INode<V> GetVertex(Func<INode<V>, bool> predicate);
+        ICollection<INode<V>> GetNodes(Func<INode<V>, bool> predicate);
         /// <summary>
         /// Reset graph
         /// </summary>
         /// <returns></returns>
-        IGraph<V> Reset();
+        IBaseGraph<V> Reset();
     }
     /// <summary>
     /// Unique indentifier for node
